@@ -1,19 +1,10 @@
 # CELTIC
 **CE**ll in silico **L**abeling using **T**abular **I**nput **C**ontext
 
-## Status: ⏳ Code Release Pending Publication
+## Status: ⏳ Code Release in Progress
 
-This repository will contain the official implementation of our paper:  
-*"Cell-context dependent in silico organelle localization in 
-label-free microscopy images"* (Publication in progress)
-
-## Coming Soon
-
-- [ ] Code implementation
-- [ ] Usage instructions
-- [ ] Trained models
-- [ ] Example results
-- [ ] Documentation
+We are organizing the repository for the paper *"Cell-context dependent in silico organelle localization in 
+label-free microscopy images"* and will release the code here soon.
 
 ## Paper Abstract
 
