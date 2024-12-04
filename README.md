@@ -4,7 +4,7 @@
 ## Status: ⏳ Code Release in Progress
 
 We are organizing the repository for the paper *"Cell-context dependent in silico organelle localization in 
-label-free microscopy images"* and will release the code here soon.
+label-free microscopy images"* and will release the code and data here by **15.01.2025**.
 
 ## Paper Abstract
 
