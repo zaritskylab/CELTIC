@@ -1,3 +1,5 @@
+# Modified version of the code from https://github.com/AllenCellModeling/pytorch_fnet/tree/release_1
+
 import os
 import torch
 import importlib
@@ -83,7 +85,7 @@ class Model(object):
 
     def do_train_iter(self, signal, target, mask=None, tabular_signal=None):
         
-        has_tabular_signal = (self.context['TABULAR_CONTEXT_METHOD']!='')
+        has_tabular_signal = tabular_signal is not None
         
         assert(self.signals_are_masked or (not self.signals_are_masked and mask==None))
         assert(has_tabular_signal or (not has_tabular_signal and tabular_signal==None))
@@ -104,7 +106,7 @@ class Model(object):
             module = self.net
         self.optimizer.zero_grad()
         
-        output = module(signal, tabular_signal) # calls 
+        output = module(signal, tabular_signal) 
             
         # if the image is masked, the loss is computed on the mask only
         if self.signals_are_masked:
@@ -119,9 +121,12 @@ class Model(object):
         return loss.item()
     
     def predict(self, signal, tabular_signal=None):
-        signal = torch.tensor(signal, dtype=torch.float32, device=self.device)
+        
+        # signal = torch.tensor(signal, dtype=torch.float32, device=self.device)
+        signal = signal.clone().detach().to(dtype=torch.float32, device=self.device)
+
         if tabular_signal!=None:
-            tabular_signal = torch.tensor(tabular_signal, dtype=torch.float32, device=self.device)
+            tabular_signal = tabular_signal.clone().detach().to(dtype=torch.float32, device=self.device)
         if len(self.gpu_ids) > 1:
             module = torch.nn.DataParallel(
                 self.net,

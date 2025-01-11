@@ -1,3 +1,5 @@
+# Adapted from https://github.com/AllenCellModeling/pytorch_fnet/tree/release_1
+
 import celtic_net.fnet_model
 import torch
 

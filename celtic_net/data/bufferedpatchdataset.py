@@ -1,10 +1,14 @@
+# Modified version of the code from https://github.com/AllenCellModeling/pytorch_fnet/tree/release_1
+
 from celtic_net.data.fnetdataset import FnetDataset
 import numpy as np
 import torch
 from tqdm import tqdm
 
 class BufferedPatchDataset(FnetDataset):
-    """Dataset that provides chunks/patchs from another dataset."""
+    """
+    A dataset that buffers patches for efficient data loading with options for shuffling and weighted sampling.
+    """
 
     def __init__(self, 
                  dataset,
@@ -20,6 +24,10 @@ class BufferedPatchDataset(FnetDataset):
                  weighted = False
     ):
         
+        """
+        Initializes the buffered dataset with the specified parameters and prepares the buffer.
+        """
+
         self.counter = 0
         
         self.dataset = dataset
@@ -44,9 +52,6 @@ class BufferedPatchDataset(FnetDataset):
             self.tabular_data_index = -1
         
         print('mask_efficieny_threshold initialized:', self.mask_efficieny_threshold)
-        
-        # remove
-        self.debug_patch_history = []
         
         assert not(buffer_switch_frequency<=0 and buffer_size!=len(dataset))
         assert not(weighted and not shuffle_images)
@@ -88,10 +93,6 @@ class BufferedPatchDataset(FnetDataset):
     def insert_new_element_into_buffer(self):
         #sample with replacement
         
-        # a new element should be added only when switch is enabled
-        # keep just for debugging. then remove.
-        assert self.buffer_switch_frequency > 0
-        
         self.buffer.pop(0)
         self.buffer_volumes.pop(0)
                 
@@ -119,6 +120,9 @@ class BufferedPatchDataset(FnetDataset):
         if self.verbose: print("Added item {0}".format(new_datum_index))
         
     def get_random_patch(self):
+        """
+        Returns a randomly selected patch from the buffer, ensuring that the mask efficiency threshold is met.
+        """
                         
         if not self.weighted:
             buffer_index = np.random.randint(len(self.buffer))
