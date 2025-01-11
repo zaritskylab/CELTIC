@@ -10,6 +10,8 @@ def get_prediction_entry(dataset, index):
     Retrieves prediction information for a given index in the dataset.
     """
     info = dataset.get_information(index)
+    if isinstance(info, dict):
+        return info
     if isinstance(info, str):
         return {'information': info}
     raise AttributeError
