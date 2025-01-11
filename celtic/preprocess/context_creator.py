@@ -7,7 +7,6 @@ import joblib
 from celtic.utils.functions import get_cell_stages
 from celtic.preprocess.ae import Autoencoder3D
 from scipy.ndimage import zoom
-from sklearn.preprocessing import OneHotEncoder
 import torch
 
 class ContextVectorsCreator():
@@ -130,11 +129,8 @@ class ContextVectorsCreator():
         cell_stage_encoded = self.metadata.cell_stage.map(stages).values
 
         # transform to one-hot
-        categories = [np.array(list(stages.values()))]
-        encoder = OneHotEncoder(categories=categories, sparse=False)
-        one_hot = encoder.fit_transform(cell_stage_encoded.reshape(-1, 1))
-        one_hot_df = pd.DataFrame(one_hot, columns=[f'cell_stage__{cat}' for cat in categories[0]]).astype(int)
-        return one_hot_df
+        categories = np.array(list(stages.values()))
+        return custom_get_dummies(cell_stage_encoded, 'cell_stage', categories)
 
     def _location(self):
         return self.metadata.edge_flag.reset_index(drop=True).rename('location')
@@ -144,7 +140,7 @@ class ContextVectorsCreator():
         # load the pretrained clustering model
         kmeans = joblib.load(f'{self.models_dir}/classic_shape_kmeans.pkl')
         scaler = joblib.load(f'{self.models_dir}/classic_shape_scaler.pkl')
-        categories=[range(5)]
+        categories=range(5)
 
         # scale
         columns_to_scale = ['z1', 'z_size', 'y_size', 'x_size', 'mask_volume']
@@ -160,10 +156,12 @@ class ContextVectorsCreator():
         pred = kmeans.predict(scaled_coordinates[columns_to_cluster])
 
         # represent as one-hot
-        encoder = OneHotEncoder(categories=categories, sparse=False)
-        one_hot = encoder.fit_transform(pred.reshape(-1, 1))
-        one_hot_df = pd.DataFrame(one_hot, columns=[f'classic_shape__{cat}' for cat in categories[0]]).astype(int)
-        return one_hot_df
+        return custom_get_dummies(pred, 'classic_shape', categories)
+    
+        # encoder = OneHotEncoder(categories=categories, sparse_output=False)
+        # one_hot = encoder.fit_transform(pred.reshape(-1, 1))
+        # one_hot_df = pd.DataFrame(one_hot, columns=[f'classic_shape__{cat}' for cat in categories[0]]).astype(int)
+        # return one_hot_df
 
     def _ml_shape(self):
 
@@ -187,17 +185,18 @@ class ContextVectorsCreator():
         # load the pretrained pca and clustering model
         pca = joblib.load(f'{self.models_dir}/ml_shape_pca.pkl')
         kmeans = joblib.load(f'{self.models_dir}/ml_shape_kmeans.pkl')
-        categories=[range(3)]
+        categories=range(3)
 
         # cluster
         pca_features = pca.transform(features)
         pred = kmeans.predict(pca_features)
         
         # represent as one-hot
-        encoder = OneHotEncoder(categories=categories, sparse=False)
-        one_hot = encoder.fit_transform(pred.reshape(-1, 1))
-        one_hot_df = pd.DataFrame(one_hot, columns=[f'ml_shape__{cat}' for cat in categories[0]]).astype(int)
-        return one_hot_df
+        return custom_get_dummies(pred, 'ml_shape', categories)
+        # encoder = OneHotEncoder(categories=categories, sparse_output=False)
+        # one_hot = encoder.fit_transform(pred.reshape(-1, 1))
+        # one_hot_df = pd.DataFrame(one_hot, columns=[f'ml_shape__{cat}' for cat in categories[0]]).astype(int)
+        # return one_hot_df
 
     def _neighborhood_density(self):
 
@@ -322,6 +321,38 @@ def save_cropped_image(image, mask, save_path, mask_value=0, normalize=False):
     return location
 
 
+def custom_get_dummies(data, col_prefix, possible_values):
+    """
+    Create dummy variables for a column, ensuring all possible values are represented
+    even when they're not present in the input data. 
+    
+    Parameters:
+    -----------
+    data : pandas.DataFrame or Series
+        Input data containing the column to encode
+    col_prefix : str
+        Name of the column to encode
+    possible_values : list
+        List of all possible values that should be represented in the output
+        
+    Returns:
+    --------
+    pandas.DataFrame
+        One-hot encoded DataFrame with columns for all possible values
+    """
+    
+    # Create dummy variables for the actual values in the data
+    dummies = pd.get_dummies(data, prefix=col_prefix)
+
+    # Add missing columns with zeros
+    for value in possible_values:
+        
+        col_name = f"{col_prefix}_{value}"
+        if col_name not in dummies.columns:
+            dummies[col_name] = 0
+            
+    # Sort columns to ensure consistent order
+    return dummies.reindex(sorted(dummies.columns), axis=1)
 
 
 
