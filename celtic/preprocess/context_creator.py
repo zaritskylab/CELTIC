@@ -342,7 +342,7 @@ def custom_get_dummies(data, col_prefix, possible_values):
     """
     
     # Create dummy variables for the actual values in the data
-    dummies = pd.get_dummies(data, prefix=col_prefix)
+    dummies = pd.get_dummies(data, prefix=col_prefix, dtype=int)
 
     # Add missing columns with zeros
     for value in possible_values:
