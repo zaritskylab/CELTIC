@@ -1,3 +1,5 @@
+# Modified version of the code from https://github.com/AllenCellModeling/pytorch_fnet/tree/release_1
+
 import torch.utils.data
 from celtic_net.data.fnetdataset import FnetDataset
 import numpy as np
@@ -19,9 +21,9 @@ class CustomizedTiffDataset(FnetDataset):
         # signals_are_masked: if True, the returned value will include the mask
 
         self.df = dataframe
-        self.transform_signal = transforms['transform_signal']
-        self.transform_target = transforms['transform_target']
-        self.transform_mask = transforms['transform_mask']
+        self.transform_signal = transforms['signal']
+        self.transform_target = transforms['target']
+        self.transform_mask = transforms['mask']
         self.tabular_context_data = tabular_context_data        
         self.signals_are_masked = signals_are_masked
         self.set_index_map()
@@ -51,6 +53,10 @@ class CustomizedTiffDataset(FnetDataset):
         return self.signals_are_masked
             
     def __getitem__(self, index): 
+        
+        """
+        Loads and transforms the signal, target, and optional mask, applying relevant transformations and returning the processed data.
+        """
         
         out = list()
                 
@@ -83,7 +89,7 @@ class CustomizedTiffDataset(FnetDataset):
                 
         # optional - read the context data
         if np.any(self.tabular_context_data):
-            out.append(self.tabular_context_data[index])
+            out.append(self.tabular_context_data.iloc[index, :].values)
         
         # shape sanity check after padding/cropping
         signal_shapes = set([out[i].shape for i in self.indexes_to_patch])

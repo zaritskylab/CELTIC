@@ -1,9 +1,12 @@
+# Adapted from https://github.com/AllenCellModeling/pytorch_fnet/tree/release_1
+
 import pandas as pd
 import os
 
 class FnetLogger(object):
     """Log values in a dict of lists."""
     def __init__(self, path_csv=None, columns=None):
+        
         if path_csv is not None:
             df = pd.read_csv(path_csv)
             self.columns = list(df.columns)

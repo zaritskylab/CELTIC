@@ -1,3 +1,5 @@
+# Modified version of the code from https://github.com/ai-med/DAFT
+
 import torch
 from collections import OrderedDict
 
@@ -15,8 +17,6 @@ class DAFT(torch.nn.Module):
     ) -> None:
 
         super().__init__()
-        kernel_size = 3
-        padding = 'same'
         
         self.bn1 = torch.nn.BatchNorm3d(out_channels, momentum=bn_momentum, affine=True)
         self.relu = torch.nn.ReLU(inplace=True)

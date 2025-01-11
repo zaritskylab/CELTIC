@@ -1,3 +1,5 @@
+# Modified version of the code from https://github.com/AllenCellModeling/pytorch_fnet/tree/release_1
+
 import celtic_net.nn_modules.fnet_nn_3d_params
 
 class Net(celtic_net.nn_modules.fnet_nn_3d_params.Net):

@@ -1,3 +1,5 @@
+# Modified version of the code from https://github.com/AllenCellModeling/pytorch_fnet/tree/release_1
+
 import numpy as np
 import scipy
 import warnings
