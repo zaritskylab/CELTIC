@@ -1,11 +1,11 @@
 import os
 import torch
 import pandas as pd
-from celtic_net.fnet_model import Model
-from celtic_net.fnetlogger import FnetLogger
-from celtic_net.data.customizedtiffdataset import CustomizedTiffDataset
-from celtic_net.data import BufferedPatchDataset
-from celtic_net.transforms import normalize, normalize_with_mask, Propper
+from celtic.celtic_net.fnet_model import Model
+from celtic.celtic_net.fnetlogger import FnetLogger
+from celtic.celtic_net.data.customizedtiffdataset import CustomizedTiffDataset
+from celtic.celtic_net.data import BufferedPatchDataset
+from celtic.celtic_net.transforms import normalize, normalize_with_mask, Propper
 
 def get_patch_dataloader(dataframe, 
                          tabular_context_data, 

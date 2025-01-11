@@ -8,14 +8,14 @@ In silico labeling prediction of organelle fluorescence from label-free microsco
 <img src="assets/f2.png" width="700" />
 
 
-## Documentation
+## Framework
 
 ### Overview
 CELTIC (Cell in silico Labeling using Tabular Input Context) is a framework designed to predict organelle fluorescence in label-free microscopy images by incorporating biologically meaningful cell contexts. This repository includes the source code for training, predicting, and creating the context vectors used in the CELTIC model.
 
 The repository is structured to allow users to easily replicate the workflow for training and predicting with CELTIC, as well as to understand the context creation process. Below, you will find the necessary steps for running each part of the pipeline, as well as links to the corresponding Colab notebooks.
 
-### Colab Notebooks
+### Example Notebooks
 - **Training the CELTIC Model**: 
 
     This notebook demonstrates how to train the CELTIC model using single cell images and context data. 
@@ -42,6 +42,9 @@ The repository is structured to allow users to easily replicate the workflow for
     [![Open In Jupyter](https://img.shields.io/badge/Open%20in-Jupyter-blue.svg)](https://github.com/nts-e/CELTIC/blob/main/examples/context_creation.ipynb)  
     
     
+### Data
+
+The single-cell data is being prepared for availability soon. We provide several FOV and single-cell example images, allowing you to run the predict and context_creation notebooks.
 
 ## Installation and Setup
 

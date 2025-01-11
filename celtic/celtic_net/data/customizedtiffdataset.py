@@ -1,7 +1,7 @@
 # Modified version of the code from https://github.com/AllenCellModeling/pytorch_fnet/tree/release_1
 
 import torch.utils.data
-from celtic_net.data.fnetdataset import FnetDataset
+from celtic.celtic_net.data.fnetdataset import FnetDataset
 import numpy as np
 import tifffile
 import pandas as pd

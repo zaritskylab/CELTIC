@@ -4,9 +4,9 @@ import sys
 import torch
 import time
 import pandas as pd
-from celtic_net.fnet_model import Model
-from utils.functions import initialize_randomness, load_metadata_files_and_save_locally
-from train.train_functions import *
+from celtic.celtic_net.fnet_model import Model
+from celtic.utils.functions import initialize_randomness, load_metadata_files_and_save_locally
+from celtic.train.train_functions import *
 import argparse
 
 def main(args=None):

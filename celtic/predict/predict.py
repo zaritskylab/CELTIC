@@ -1,13 +1,13 @@
-from celtic_net.data.customizedtiffdataset import CustomizedTiffDataset
-from celtic_net.fnet_model import Model
-from utils.functions import load_metadata_files_and_save_locally
-from predict.predict_functions import *
+from celtic.celtic_net.data.customizedtiffdataset import CustomizedTiffDataset
+from celtic.celtic_net.fnet_model import Model
+from celtic.celtic_net.transforms import normalize, normalize_with_mask, Propper
+from celtic.predict.predict_functions import *
+from celtic.utils.functions import load_metadata_files_and_save_locally
 import os
 import torch
 import json
 import argparse
 from tqdm import tqdm
-from celtic_net.transforms import normalize, normalize_with_mask, Propper
 
 def main(args=None):
     if args is None:

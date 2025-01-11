@@ -1,7 +1,7 @@
 # Modified version of the code from https://github.com/AllenCellModeling/pytorch_fnet/tree/release_1
 
 import torch
-from celtic_net.nn_modules.daft import DAFT
+from celtic.celtic_net.nn_modules.daft import DAFT
 
 class Net(torch.nn.Module):
     def __init__(self,

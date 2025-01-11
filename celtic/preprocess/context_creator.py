@@ -4,9 +4,9 @@ import numpy as np
 import os
 import json
 import joblib
-from utils.functions import get_cell_stages
+from celtic.utils.functions import get_cell_stages
+from celtic.preprocess.ae import Autoencoder3D
 from scipy.ndimage import zoom
-from preprocess.ae import Autoencoder3D
 from sklearn.preprocessing import OneHotEncoder
 import torch
 

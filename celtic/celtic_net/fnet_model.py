@@ -33,7 +33,7 @@ class Model(object):
         if self.nn_module is None:
             self.net = None
             return
-        self.net = importlib.import_module('celtic_net.nn_modules.' + self.nn_module).Net(**nn_kwargs, context=self.context, signals_are_masked=self.signals_are_masked)
+        self.net = importlib.import_module('celtic.celtic_net.nn_modules.' + self.nn_module).Net(**nn_kwargs, context=self.context, signals_are_masked=self.signals_are_masked)
         if self.init_weights:
             self.net.apply(_weights_init)
         self.net.to(self.device)
