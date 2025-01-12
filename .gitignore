@@ -1,2 +1,6 @@
 .ipynb_checkpoints/
 __pycache__/
+*egg-info*
+examples/experiments/*
+examples/single_cells/*
+resources/*
