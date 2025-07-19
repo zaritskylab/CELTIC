@@ -317,7 +317,7 @@ def save_cropped_image(image, mask, save_path, mask_value=0, normalize=False):
     image_cropped = image_masked[location[0]:location[1]+1, location[2]:location[3]+1, location[4]:location[5]+1]
         
     if save_path:
-        tifffile.imsave(save_path, image_cropped)
+        tifffile.imwrite(save_path, image_cropped)
     return location
 
 
