@@ -1,27 +1,54 @@
 # CELTIC
-**CE**ll in silico **L**abeling using **T**abular **I**nput **C**ontext
 
-## Paper Abstract
+CELTIC (CEll in silico Labeling using Tabular Input Context) is a context-dependent model for in silico labeling of organelle fluorescence from label-free microscopy images. By incorporating biological cell contexts, CELTIC enhances the prediction of out-of-distribution data such as cells undergoing mitosis. The explicit inclusion of context has the potential to harmonize multiple datasets, paving the way for generalized in silico labeling foundation models. 
 
-In silico labeling prediction of organelle fluorescence from label-free microscopy images has the potential to revolutionize our understanding of cells as integrated complex systems. However, out-of-distribution data caused by changes in the intracellular organization across cell types, cellular processes or perturbations, can lead to altered label-free images and impaired in silico labeling. We demonstrated that incorporating biological meaningful cell contexts, via a context-dependent model that we call CELTIC, enhanced in silico labeling prediction and enabled downstream analysis of out-of-distribution data such as cells undergoing mitosis, and cells located at the edge of the colony. These results suggest a link between cell context and intracellular organization. Using CELTIC for generative traversal along single cells undergoing context transition enabled integrated characterization of the gradual alterations in cellular organization across multiple organelles, overcoming inter-cell variability. The explicit inclusion of context has the potential to harmonize multiple datasets, paving the way for generalized in silico labeling foundation models.
-
+This repository contains the code, models, and data preprocessing tools for the CELTIC pipeline, as described in our [paper](https://www.biorxiv.org/content/10.1101/2024.11.10.622841v1.abstract):
 <img src="assets/f2.png" width="700" />
 
 
-## Framework
 
-### Overview
-CELTIC (Cell in silico Labeling using Tabular Input Context) is a framework designed to predict organelle fluorescence in label-free microscopy images by incorporating biologically meaningful cell contexts. This repository includes the source code for training, predicting, and creating the context vectors used in the CELTIC model.
+## Overview
+This repository provides the complete implementation for training, inference, and context vector generation. The structure is designed to help users easily reproduce the workflow and understand how biological context enhances organelle prediction. Below are the steps for running each part of the pipeline, along with links to the relevant Colab notebooks.
+    
+## Data
 
-The repository is structured to allow users to easily replicate the workflow for training and predicting with CELTIC, as well as to understand the context creation process. Below, you will find the necessary steps for running each part of the pipeline, as well as links to the corresponding Colab notebooks.
+The datasets used for training and evaluation are available through the [BioImage Archive (accession S-BIAD2156)](https://www.ebi.ac.uk/biostudies/bioimages/studies/S-BIAD2156). The datasets contain six organelles, each with 3D single-cell images of hiPSC-derived cells with brightfield imaging, the EGFP-labeled organelle, segmentation masks, and metadata (cell cycle, edge flag, neighbors, and shape information).
 
-### Example Notebooks
+
+## Installation and Setup
+
+1. Create a conda environment:
+    ```bash
+    conda create -n celtic_env python=3.9
+    conda activate celtic_env
+2. Clone the repository:
+   ```bash
+   git clone https://github.com/zaritskylab/CELTIC
+   cd CELTIC
+<!--
+3. Install NumPy < 2.0 (NumPy 2.0 introduces breaking changes that may be incompatible with libraries such as scikit-learn, opencv-python, or older versions of PyTorch used in this project):
+    ```bash
+    pip install "numpy<2.0"
+-->
+3. Install the required dependencies:
+    ```bash
+    pip install .
+<!--
+## Running on SLURM
+
+To train the model on a SLURM cluster, use the provided sbatch file:
+
+```bash
+sbatch train/train_celtic.sbatch
+-->
+
+## How-To Notebooks
 - **Training the CELTIC Model**: 
 
     This notebook demonstrates how to train the CELTIC model using single cell images and context data. 
     
-    [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nts-e/CELTIC/blob/main/examples/train.ipynb)
-    [![Open In Jupyter](https://img.shields.io/badge/Open%20in-Jupyter-blue.svg)](https://github.com/nts-e/CELTIC/blob/main/examples/train.ipynb)
+    [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/zaritskylab/CELTIC/blob/main/examples/train.ipynb)
+    [![Open In Jupyter](https://img.shields.io/badge/Open%20in-Jupyter-blue.svg)](https://github.com/zaritskylab/CELTIC/blob/main/examples/train.ipynb)
 
     
 
@@ -29,30 +56,16 @@ The repository is structured to allow users to easily replicate the workflow for
 
     This notebook shows how to run predictions using the trained single cell model, both with and without context. It allows for the comparison of results and demonstrates how context improves the prediction accuracy.
     
-    [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nts-e/CELTIC/blob/main/examples/predict.ipynb)
-    [![Open In Jupyter](https://img.shields.io/badge/Open%20in-Jupyter-blue.svg)](https://github.com/nts-e/CELTIC/blob/main/examples/predict.ipynb)
+    [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/zaritskylab/CELTIC/blob/main/examples/predict.ipynb)
+    [![Open In Jupyter](https://img.shields.io/badge/Open%20in-Jupyter-blue.svg)](https://github.com/zaritskylab/CELTIC/blob/main/examples/predict.ipynb)
     
     
 
 - **Context Creation**:
 
     This notebook provides a detailed walkthrough of how to create the cell context features used in the CELTIC model.
+    Note that the [BioImage Archive dataset (S-BIAD2156)](https://www.ebi.ac.uk/biostudies/bioimages/studies/S-BIAD2156) already includes precomputed context features for all single-cell images.  This notebook is useful if you want to start from scratch — for example, to take a field of view (FOV) from the [Allen Institute WTC-11 dataset](https://virtualcellmodels.cziscience.com/dataset/allencell-wtc11-hipsc-single-cell#dataset-overview), crop individual cells, and generate the corresponding context features yourself.
     
-    [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nts-e/CELTIC/blob/main/examples/context_creation.ipynb)
-    [![Open In Jupyter](https://img.shields.io/badge/Open%20in-Jupyter-blue.svg)](https://github.com/nts-e/CELTIC/blob/main/examples/context_creation.ipynb)  
+    [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/zaritskylab/CELTIC/blob/main/examples/context_creation.ipynb)
+    [![Open In Jupyter](https://img.shields.io/badge/Open%20in-Jupyter-blue.svg)](https://github.com/zaritskylab/CELTIC/blob/main/examples/context_creation.ipynb)  
     
-    
-### Data
-
-The single-cell data is being prepared for availability soon. We provide several FOV and single-cell example images, allowing you to run the predict and context_creation notebooks.
-
-## Installation and Setup
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/zaritskylab/CELTIC
-
-2. Install the required dependencies:
-    ```bash
-    %cd CELTIC
-    !pip install .
