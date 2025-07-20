@@ -54,14 +54,14 @@ def download_resources(folder_url, local_folder_path):
 def get_cell_stages():
     return ['M0','M1M2','M3','M4M5','M6M7_complete','M6M7_single']
 
-def initialize_experiment(organelle, experiment_type, large_files_repository_path):
+def initialize_experiment(organelle, experiment_type, models_dir):
     
     # set path_save_dir
     formatted_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     path_save_dir = f'./experiments/{experiment_type}/{organelle}/{formatted_time}'
     
     # load configuration
-    with open(f'{large_files_repository_path}/{organelle}/models/context_model_config.json', 'r') as file:
+    with open(f'{models_dir}/context_model_config.json', 'r') as file:
         context_model_config = json.load(file)
         
     # embed train_patch_size when needed    
