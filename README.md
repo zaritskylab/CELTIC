@@ -12,7 +12,43 @@ This repository provides the complete implementation for training, inference, an
     
 ## Data
 
-The datasets used for training and evaluation are available through the [BioImage Archive (accession S-BIAD2156)](https://www.ebi.ac.uk/biostudies/bioimages/studies/S-BIAD2156). The datasets contain six organelles, each with 3D single-cell images of hiPSC-derived cells with brightfield imaging, the EGFP-labeled organelle, segmentation masks, and metadata (cell cycle, edge flag, neighbors, and shape information).
+The datasets used for training and evaluation are available through the BioImage Archive at https://doi.org/10.6019/S-BIAD2156. The datasets contain six organelles, each with 3D single-cell images of hiPSC-derived cells with brightfield imaging, the EGFP-labeled organelle, segmentation masks, and metadata (cell cycle, edge flag, neighbors, and shape information).
+
+The datasets can be downloaded via FTP at:
+`ftp://ftp.ebi.ac.uk/pub/databases/biostudies/S-BIAD/156/S-BIAD2156/Files`
+
+Each organelle has its own folder, structured as follows:
+
+
+```
+organelle_name/
+├── cell_images/
+│   ├── <FOVId_CellId>_signal.tiff
+│   ├── <FOVId_CellId>_target.tiff
+│   └── <FOVId_CellId>_mask.tiff
+│   ```
+│
+├── metadata/
+│   ├── metadata.csv
+│   ├── context.csv
+│   ├── cell_cube_coordinates_in_fov.csv
+│   └── neighbours.csv
+
+
+```
+`cell_images`: Contains 2052–2993 3D single-cell images cropped from 180 Fields of View (FOVs). Each cell is represented by three aligned 3D images:
+
+*   <FOVId_CellId>_signal.tiff - Brightfield
+*   <FOVId_CellId>_target.tiff - EGFP-tagged organelle
+*   <FOVId_CellId>_mask.tiff - Segmentation mask
+
+`metadata.csv`: FOV and cell IDs, paths to cell images, columns from the [WTC-11 dataset](https://www.nature.com/articles/s41586-022-05563-7) (e.g., cell index in FOV mask, cell_stage).
+
+`context.csv`: Precomputed CELTIC context for each cell (same order as metadata.csv)
+
+`cell_cube_coordinates_in_fov.csv`: Computed cell shape descriptors.
+
+`neighbours.csv`: Computed neighborhood features.
 
 
 ## Installation and Setup
@@ -64,8 +100,13 @@ sbatch train/train_celtic.sbatch
 - **Context Creation**:
 
     This notebook provides a detailed walkthrough of how to create the cell context features used in the CELTIC model.
-    Note that the [BioImage Archive dataset (S-BIAD2156)](https://www.ebi.ac.uk/biostudies/bioimages/studies/S-BIAD2156) already includes precomputed context features for all single-cell images.  This notebook is useful if you want to start from scratch — for example, to take a field of view (FOV) from the [Allen Institute WTC-11 dataset](https://virtualcellmodels.cziscience.com/dataset/allencell-wtc11-hipsc-single-cell#dataset-overview), crop individual cells, and generate the corresponding context features yourself.
+    Note that the [BioImage Archive dataset (S-BIAD2156)](https://doi.org/10.6019/S-BIAD2156) already includes precomputed context features for all single-cell images.  This notebook is useful if you want to start from scratch — for example, to take a field of view (FOV) from the [Allen Institute WTC-11 dataset](https://virtualcellmodels.cziscience.com/dataset/allencell-wtc11-hipsc-single-cell#dataset-overview), crop individual cells, and generate the corresponding context features yourself.
     
     [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/zaritskylab/CELTIC/blob/main/examples/context_creation.ipynb)
     [![Open In Jupyter](https://img.shields.io/badge/Open%20in-Jupyter-blue.svg)](https://github.com/zaritskylab/CELTIC/blob/main/examples/context_creation.ipynb)  
     
+## Contacts
+
+**Author**: [Nitsan Elmalam](mailto:enitsan8@gmail.com)
+
+**Corresponding Author**: [Assaf Zaritsky](mailto:assafzar@gmail.com)
