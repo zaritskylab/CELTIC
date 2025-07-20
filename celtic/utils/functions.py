@@ -9,48 +9,6 @@ import os
 import re
 from urllib.parse import parse_qs, urlparse
 
-def download_resources(folder_url, local_folder_path):
-    """
-    Downloads contents of a shared Google Drive folder using gdown.
-    Works with publicly shared folder URLs.
-    
-    Parameters:
-    folder_url (str): URL of the shared Google Drive folder
-    local_folder_path (str): Path where files should be downloaded
-    
-    Returns:
-    bool: True if successful, False otherwise
-    """
-    try:
-        # Create local folder if it doesn't exist
-        os.makedirs(local_folder_path, exist_ok=True)
-        
-        # Extract folder ID from URL
-        if 'folders' in folder_url:
-            folder_id = folder_url.split('folders/')[-1].split('?')[0]
-        else:
-            parsed = urlparse(folder_url)
-            folder_id = parse_qs(parsed.query).get('id', [None])[0]
-            
-        if not folder_id:
-            raise ValueError("Could not extract folder ID from URL")
-            
-        # Create the folder URL format that gdown expects
-        folder_url = f"https://drive.google.com/drive/folders/{folder_id}"
-        
-        # Download the entire folder
-        gdown.download_folder(url=folder_url, 
-                            output=local_folder_path,
-                            quiet=False,
-                            use_cookies=False)
-        
-        print(f"Download completed. Files saved to: {local_folder_path}")
-        return True
-        
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
-        return False
-
 def get_cell_stages():
     return ['M0','M1M2','M3','M4M5','M6M7_complete','M6M7_single']
 
