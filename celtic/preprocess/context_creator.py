@@ -19,8 +19,12 @@ class ContextVectorsCreator():
         The organelle for which the context vectors are being created.
     fovs_to_process : list
         List of Field of View (FOV) IDs to process.
-    resources_dir : str
-        Path to the resources directory containing the models and data.
+    metadata_path : str
+        Path to the metadata CSV file containing cell information.
+    models_dir : str
+        Path to the directory containing the models and configuration files.
+    fov_images_dir : str
+        Path to the directory containing the Field of View images.
     single_cell_image_dir : str
         Directory where single cell images will be saved.
     """
@@ -28,17 +32,21 @@ class ContextVectorsCreator():
     def __init__(self,
                  organelle,
                  fovs_to_process,
-                 resources_dir,
+                 metadata_path,
+                 models_dir,
+                 fov_images_dir,
                  single_cell_image_dir):
                 
         self.organelle = organelle
         self.fovs_to_process = fovs_to_process
-        self.resources_dir = resources_dir
+        self.metadata_path = metadata_path
+        self.models_dir = models_dir
+        self.fov_images_dir = fov_images_dir
         self.single_cell_image_dir = single_cell_image_dir
-        self.models_dir = f'{self.resources_dir}/{self.organelle}/models'
+        
 
         # load metadata of the requested cells
-        metadata = pd.read_csv(f'{self.resources_dir}/{organelle}/metadata/metadata.csv')
+        metadata = pd.read_csv(self.metadata_path)
         self.metadata = metadata[metadata.FOVId.isin(fovs_to_process)].sort_values(by=['FOVId', 'CellId'])
 
         # load context configuration
@@ -64,7 +72,6 @@ class ContextVectorsCreator():
         Extracts single-cell images from FOVs, crops them according to the mask, and saves them in the specified directory.
         It also calculates the volume and other properties of the cell masks and stores these in a DataFrame.
         """
-        fov_images_dir = f'{self.resources_dir}/{self.organelle}/fov_images'
 
         os.makedirs(self.single_cell_image_dir, exist_ok=True) 
         save_path_format = self.single_cell_image_dir + '/{}_{}_{}.tiff'
@@ -81,12 +88,12 @@ class ContextVectorsCreator():
                 last_fov_id = row.FOVId
 
                 # load signal and target
-                fov_image = tifffile.imread(f'{fov_images_dir}/{row.fov_path}')
+                fov_image = tifffile.imread(f'{self.fov_images_dir}/{row.fov_path}')
                 signal = fov_image[:,row.ChannelNumberBrightfield]
                 target = fov_image[:,row.ChannelNumberStruct]
                 
                 # load label map
-                fov_seg_image = tifffile.imread(f'{fov_images_dir}/{row.fov_seg_path}')
+                fov_seg_image = tifffile.imread(f'{self.fov_images_dir}/{row.fov_seg_path}')
                 label_map = fov_seg_image[:, 1] # cell segmentation channel
 
                 # collect the number of neighbors
@@ -158,11 +165,6 @@ class ContextVectorsCreator():
         # represent as one-hot
         return custom_get_dummies(pred, 'classic_shape', categories)
     
-        # encoder = OneHotEncoder(categories=categories, sparse_output=False)
-        # one_hot = encoder.fit_transform(pred.reshape(-1, 1))
-        # one_hot_df = pd.DataFrame(one_hot, columns=[f'classic_shape__{cat}' for cat in categories[0]]).astype(int)
-        # return one_hot_df
-
     def _ml_shape(self):
 
         # create shape images
@@ -171,7 +173,7 @@ class ContextVectorsCreator():
 
         # load pretrained autoencoder
         autoencoder = Autoencoder3D()
-        autoencoder.load_state_dict(torch.load(f'{self.resources_dir}/ae.pth'))
+        autoencoder.load_state_dict(torch.load(f'{self.models_dir}/ae.pth'))
         autoencoder.eval();
 
         # extract encodings
@@ -193,11 +195,7 @@ class ContextVectorsCreator():
         
         # represent as one-hot
         return custom_get_dummies(pred, 'ml_shape', categories)
-        # encoder = OneHotEncoder(categories=categories, sparse_output=False)
-        # one_hot = encoder.fit_transform(pred.reshape(-1, 1))
-        # one_hot_df = pd.DataFrame(one_hot, columns=[f'ml_shape__{cat}' for cat in categories[0]]).astype(int)
-        # return one_hot_df
-
+        
     def _neighborhood_density(self):
 
         if not hasattr(self, 'neighbors'):
@@ -320,7 +318,6 @@ def save_cropped_image(image, mask, save_path, mask_value=0, normalize=False):
         tifffile.imwrite(save_path, image_cropped)
     return location
 
-
 def custom_get_dummies(data, col_prefix, possible_values):
     """
     Create dummy variables for a column, ensuring all possible values are represented
@@ -353,6 +350,3 @@ def custom_get_dummies(data, col_prefix, possible_values):
             
     # Sort columns to ensure consistent order
     return dummies.reindex(sorted(dummies.columns), axis=1)
-
-
-
