@@ -1,0 +1,12 @@
+{
+	"context_features": ["edge_flag","cell_stage","z_xy_volume_cluster_5","image_shape_cluster_3_pca5","neighbours"],
+	"daft_embedding_factor": 4, 
+	"daft_scale_activation": "sigmoid",
+	"train_patch_size": "[32, 64, 64]",
+    "transforms": {"signal": "[normalize_with_mask, Propper(action='+', constant_values=0, min_final_shape=train_patch_size)]", 
+                  "target": "[normalize_with_mask, Propper(action='+', constant_values=0, min_final_shape=train_patch_size)]",
+                  "mask": "[Propper(action='+', constant_values=0, min_final_shape=train_patch_size)]"
+                  },
+    "neighbors_min_max": "(2,13)",
+    "max_cell_coordinates": "[62, 443, 450]" 
+}
