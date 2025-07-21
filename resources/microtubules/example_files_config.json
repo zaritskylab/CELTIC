@@ -13,6 +13,21 @@
             "fov_metadata": [
                 "microtubules/data_for_git_examples/resources/microtubules//metadata/metadata.csv"
             ]
+        },
+    "predict":
+        {
+            "metadata": [
+                "microtubules/data_for_git_examples/resources/microtubules/metadata/test_images.csv",
+                "microtubules/data_for_git_examples/resources/microtubules/metadata/test_context.csv"
+            ],
+            "cell_images": [
+                "microtubules//cell_images/419_243422_signal.tiff",
+                "microtubules//cell_images/419_243422_target.tiff",
+                "microtubules//cell_images/419_243422_mask.tiff",
+                "microtubules//cell_images/419_243424_signal.tiff",
+                "microtubules//cell_images/419_243424_target.tiff",
+                "microtubules//cell_images/419_243424_mask.tiff"
+            ]
         }
     }
 }

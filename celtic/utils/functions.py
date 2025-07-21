@@ -79,16 +79,22 @@ def load_metadata_files_and_save_locally(file_types, path_images_csv, path_conte
     
     return image_df, context_df
 
-def download_file(url, dest_path):
+def download_file_chunked(url, dest_path):
     filename = os.path.basename(url)
-    destination = dest_path / filename
+    destination = Path(dest_path) / filename
     if destination.exists():
         print(f"✅ Already exists: {filename}")
         return
+
     try:
         print(f"⬇️ Downloading: {filename}")
-        print(destination)
-        urllib.request.urlretrieve(url, destination)
+        with urllib.request.urlopen(url) as response, open(destination, 'wb') as out_file:
+            CHUNK = 8192
+            while True:
+                chunk = response.read(CHUNK)
+                if not chunk:
+                    break
+                out_file.write(chunk)
         print(f"✅ Saved to: {destination}")
     except Exception as e:
         print(f"❌ Failed to download {url}: {e}")
@@ -115,7 +121,7 @@ def download_example_files(resources_dir, example_type):
         for rel_path in rel_paths:
             full_url = f"{server_path}/{rel_path}"
             full_dest_dir = resources_dir / dest_dir
-            download_file(full_url, full_dest_dir)
+            download_file_chunked(full_url, full_dest_dir)
 
 def show_images_subplots(shape, images, titles=None, figsize=(20,20), axis_off=False, cmap='viridis', origin='upper', vmin=None, vmax=None, save=None, tight_layout=False):
     
