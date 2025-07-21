@@ -4,10 +4,9 @@ from datetime import datetime
 import torch
 import json
 import pandas as pd
-import gdown
+from pathlib import Path
 import os
-import re
-from urllib.parse import parse_qs, urlparse
+import urllib.request
 
 def get_cell_stages():
     return ['M0','M1M2','M3','M4M5','M6M7_complete','M6M7_single']
@@ -79,6 +78,44 @@ def load_metadata_files_and_save_locally(file_types, path_images_csv, path_conte
             context_df[i].to_csv(f"{path_run_dir}/{file_types[i]}_context.csv", index=False)
     
     return image_df, context_df
+
+def download_file(url, dest_path):
+    filename = os.path.basename(url)
+    destination = dest_path / filename
+    if destination.exists():
+        print(f"✅ Already exists: {filename}")
+        return
+    try:
+        print(f"⬇️ Downloading: {filename}")
+        print(destination)
+        urllib.request.urlretrieve(url, destination)
+        print(f"✅ Saved to: {destination}")
+    except Exception as e:
+        print(f"❌ Failed to download {url}: {e}")
+
+def download_example_files(resources_dir, example_type):
+
+    with open(f'{resources_dir}/example_files_config.json', 'r') as f:
+        config = json.load(f)
+
+    server_path = config["server"]
+    
+    files_to_download = {
+        Path(k): v for k, v in config["files_to_download"][example_type].items()
+    }
+    
+    # create subfolders in the resources folder
+    for k in files_to_download:
+        dir_path = resources_dir / k
+        dir_path.mkdir(parents=True, exist_ok=True)
+
+    # download files
+    for dest_dir, rel_paths in files_to_download.items():
+
+        for rel_path in rel_paths:
+            full_url = f"{server_path}/{rel_path}"
+            full_dest_dir = resources_dir / dest_dir
+            download_file(full_url, full_dest_dir)
 
 def show_images_subplots(shape, images, titles=None, figsize=(20,20), axis_off=False, cmap='viridis', origin='upper', vmin=None, vmax=None, save=None, tight_layout=False):
     

@@ -28,5 +28,6 @@ dependencies = [
     "opencv-python>=4.6.0.66",
     "scipy>=1.5.4",
     "torch>=1.13.1",
-    "gdown"
+    "gdown",
+    "ipykernel"
 ]
