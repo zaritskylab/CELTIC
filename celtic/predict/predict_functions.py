@@ -23,7 +23,7 @@ def save_tiff_and_log(tag, ar, path_tiff_dir, entry, path_log_dir, verbose=0):
     if not os.path.exists(path_tiff_dir):
         os.makedirs(path_tiff_dir)
     path_tiff = os.path.join(path_tiff_dir, '{:s}.tiff'.format(tag))
-    tifffile.imsave(path_tiff, ar)
+    tifffile.imwrite(path_tiff, ar)
     if verbose:
         print('saved:', path_tiff)
     entry['path_' + tag] = os.path.relpath(path_tiff, path_log_dir)
