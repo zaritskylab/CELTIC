@@ -61,24 +61,15 @@ organelle_name/
    ```bash
    git clone https://github.com/zaritskylab/CELTIC
    cd CELTIC
-<!--
-3. Install NumPy < 2.0 (NumPy 2.0 introduces breaking changes that may be incompatible with libraries such as scikit-learn, opencv-python, or older versions of PyTorch used in this project):
-    ```bash
-    pip install "numpy<2.0"
--->
 3. Install the required dependencies:
     ```bash
     pip install .
-<!--
-## Running on SLURM
 
-To train the model on a SLURM cluster, use the provided sbatch file:
-
-```bash
-sbatch train/train_celtic.sbatch
--->
 
 ## How-To Notebooks
+
+We have created demo example notebooks, which are located in the `examples` folder.
+
 - **Training the CELTIC Model**: 
 
     This notebook demonstrates how to train the CELTIC model using single cell images and context data. 
@@ -110,3 +101,7 @@ sbatch train/train_celtic.sbatch
 **Author**: [Nitsan Elmalam](mailto:enitsan8@gmail.com)
 
 **Corresponding Author**: [Assaf Zaritsky](mailto:assafzar@gmail.com)
+
+## License
+
+This repository is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0)](https://creativecommons.org/licenses/by-nc/4.0/).
