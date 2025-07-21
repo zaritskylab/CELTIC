@@ -4,22 +4,64 @@ from datetime import datetime
 import torch
 import json
 import pandas as pd
-from pathlib import Path
+import gdown
 import os
-import urllib.request
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import re
+from urllib.parse import parse_qs, urlparse
+
+def download_resources(folder_url, local_folder_path):
+    """
+    Downloads contents of a shared Google Drive folder using gdown.
+    Works with publicly shared folder URLs.
+    
+    Parameters:
+    folder_url (str): URL of the shared Google Drive folder
+    local_folder_path (str): Path where files should be downloaded
+    
+    Returns:
+    bool: True if successful, False otherwise
+    """
+    try:
+        # Create local folder if it doesn't exist
+        os.makedirs(local_folder_path, exist_ok=True)
+        
+        # Extract folder ID from URL
+        if 'folders' in folder_url:
+            folder_id = folder_url.split('folders/')[-1].split('?')[0]
+        else:
+            parsed = urlparse(folder_url)
+            folder_id = parse_qs(parsed.query).get('id', [None])[0]
+            
+        if not folder_id:
+            raise ValueError("Could not extract folder ID from URL")
+            
+        # Create the folder URL format that gdown expects
+        folder_url = f"https://drive.google.com/drive/folders/{folder_id}"
+        
+        # Download the entire folder
+        gdown.download_folder(url=folder_url, 
+                            output=local_folder_path,
+                            quiet=False,
+                            use_cookies=False)
+        
+        print(f"Download completed. Files saved to: {local_folder_path}")
+        return True
+        
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return False
 
 def get_cell_stages():
     return ['M0','M1M2','M3','M4M5','M6M7_complete','M6M7_single']
 
-def initialize_experiment(organelle, experiment_type, models_dir):
+def initialize_experiment(organelle, experiment_type, large_files_repository_path):
     
     # set path_save_dir
     formatted_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     path_save_dir = f'./experiments/{experiment_type}/{organelle}/{formatted_time}'
     
     # load configuration
-    with open(f'{models_dir}/context_model_config.json', 'r') as file:
+    with open(f'{large_files_repository_path}/{organelle}/models/context_model_config.json', 'r') as file:
         context_model_config = json.load(file)
         
     # embed train_patch_size when needed    
@@ -79,69 +121,6 @@ def load_metadata_files_and_save_locally(file_types, path_images_csv, path_conte
             context_df[i].to_csv(f"{path_run_dir}/{file_types[i]}_context.csv", index=False)
     
     return image_df, context_df
-
-def download_file_chunked(url, dest_path, counter):
-    filename = os.path.basename(url)
-    destination = Path(dest_path) / filename
-    if destination.exists():
-        print(f"✅ Already exists: {filename}")
-        return
-
-    try:
-        print(f"⬇️ Downloading [{counter}]: {filename}")
-        with urllib.request.urlopen(url) as response, open(destination, 'wb') as out_file:
-            CHUNK = 8192
-            while True:
-                chunk = response.read(CHUNK)
-                if not chunk:
-                    break
-                out_file.write(chunk)
-        print(f"✅ Saved to: {destination}")
-    except Exception as e:
-        print(f"❌ Failed to download {url}: {e}")
-
-def download_example_files(resources_dir, example_type, from_dict=None):
-
-    with open(f'{resources_dir}/example_files_config.json', 'r') as f:
-        config = json.load(f)
-
-    server_path = config["server"]
-    
-    if from_dict is None:
-        files_to_download = {
-            Path(k): v for k, v in config["files_to_download"][example_type].items()
-        }
-    else:
-        files_to_download = {
-            Path(k): v for k, v in from_dict.items()
-        }
-    
-    # create subfolders in the resources folder
-    for k in files_to_download:
-        dir_path = resources_dir / k
-        dir_path.mkdir(parents=True, exist_ok=True)
-
-    # define a single download task
-    def download_task(dest_dir, rel_path, counter):
-        full_url = f"{server_path}/{rel_path}"
-        full_dest_dir = resources_dir / dest_dir
-        download_file_chunked(full_url, full_dest_dir, counter)
-
-    # collect all download tasks
-    tasks = []
-    i=1
-    with ThreadPoolExecutor(max_workers=4) as executor:
-        for dest_dir, rel_paths in files_to_download.items():
-            for rel_path in rel_paths:
-                tasks.append(executor.submit(download_task, dest_dir, rel_path, i))
-                i+=1
-
-        # Optionally wait for all to finish and handle exceptions
-        for future in as_completed(tasks):
-            try:
-                future.result()
-            except Exception as e:
-                print(f"Download failed: {e}")
 
 def show_images_subplots(shape, images, titles=None, figsize=(20,20), axis_off=False, cmap='viridis', origin='upper', vmin=None, vmax=None, save=None, tight_layout=False):
     

@@ -3,9 +3,4 @@ __pycache__/
 *egg-info*
 examples/experiments/*
 examples/single_cells/*
-.history
-build/*
-resources/microtubules/fov_*
-resources/microtubules/cell_images/*
-resources/microtubules/metadata/*
-resources/microtubules/models/*.p
+resources/*
