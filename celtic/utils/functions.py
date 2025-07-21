@@ -7,6 +7,7 @@ import pandas as pd
 from pathlib import Path
 import os
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 def get_cell_stages():
     return ['M0','M1M2','M3','M4M5','M6M7_complete','M6M7_single']
@@ -79,7 +80,7 @@ def load_metadata_files_and_save_locally(file_types, path_images_csv, path_conte
     
     return image_df, context_df
 
-def download_file_chunked(url, dest_path):
+def download_file_chunked(url, dest_path, counter):
     filename = os.path.basename(url)
     destination = Path(dest_path) / filename
     if destination.exists():
@@ -87,7 +88,7 @@ def download_file_chunked(url, dest_path):
         return
 
     try:
-        print(f"⬇️ Downloading: {filename}")
+        print(f"⬇️ Downloading [{counter}]: {filename}")
         with urllib.request.urlopen(url) as response, open(destination, 'wb') as out_file:
             CHUNK = 8192
             while True:
@@ -99,29 +100,48 @@ def download_file_chunked(url, dest_path):
     except Exception as e:
         print(f"❌ Failed to download {url}: {e}")
 
-def download_example_files(resources_dir, example_type):
+def download_example_files(resources_dir, example_type, from_dict=None):
 
     with open(f'{resources_dir}/example_files_config.json', 'r') as f:
         config = json.load(f)
 
     server_path = config["server"]
     
-    files_to_download = {
-        Path(k): v for k, v in config["files_to_download"][example_type].items()
-    }
+    if from_dict is None:
+        files_to_download = {
+            Path(k): v for k, v in config["files_to_download"][example_type].items()
+        }
+    else:
+        files_to_download = {
+            Path(k): v for k, v in from_dict.items()
+        }
     
     # create subfolders in the resources folder
     for k in files_to_download:
         dir_path = resources_dir / k
         dir_path.mkdir(parents=True, exist_ok=True)
 
-    # download files
-    for dest_dir, rel_paths in files_to_download.items():
+    # define a single download task
+    def download_task(dest_dir, rel_path, counter):
+        full_url = f"{server_path}/{rel_path}"
+        full_dest_dir = resources_dir / dest_dir
+        download_file_chunked(full_url, full_dest_dir, counter)
 
-        for rel_path in rel_paths:
-            full_url = f"{server_path}/{rel_path}"
-            full_dest_dir = resources_dir / dest_dir
-            download_file_chunked(full_url, full_dest_dir)
+    # collect all download tasks
+    tasks = []
+    i=1
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        for dest_dir, rel_paths in files_to_download.items():
+            for rel_path in rel_paths:
+                tasks.append(executor.submit(download_task, dest_dir, rel_path, i))
+                i+=1
+
+        # Optionally wait for all to finish and handle exceptions
+        for future in as_completed(tasks):
+            try:
+                future.result()
+            except Exception as e:
+                print(f"Download failed: {e}")
 
 def show_images_subplots(shape, images, titles=None, figsize=(20,20), axis_off=False, cmap='viridis', origin='upper', vmin=None, vmax=None, save=None, tight_layout=False):
     
