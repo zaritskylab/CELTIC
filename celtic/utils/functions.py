@@ -8,6 +8,7 @@ from pathlib import Path
 import os
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
 
 def get_cell_stages():
     return ['M0','M1M2','M3','M4M5','M6M7_complete','M6M7_single']
@@ -80,25 +81,42 @@ def load_metadata_files_and_save_locally(file_types, path_images_csv, path_conte
     
     return image_df, context_df
 
-def download_file_chunked(url, dest_path, counter):
+def download_file_chunked(url, dest_path, counter, retries=3, wait_sec=2):
     filename = os.path.basename(url)
     destination = Path(dest_path) / filename
+
     if destination.exists():
         print(f"✅ Already exists: {filename}")
         return
 
-    try:
-        print(f"⬇️ Downloading [{counter}]: {filename}")
-        with urllib.request.urlopen(url) as response, open(destination, 'wb') as out_file:
-            CHUNK = 8192
-            while True:
-                chunk = response.read(CHUNK)
-                if not chunk:
-                    break
-                out_file.write(chunk)
-        print(f"✅ Saved to: {destination}")
-    except Exception as e:
-        print(f"❌ Failed to download {url}: {e}")
+    attempt = 0
+    while attempt < retries:
+        try:
+            print(f"⬇️ Downloading [{counter}] Attempt {attempt + 1}: {filename}")
+            with urllib.request.urlopen(url) as response, open(destination, 'wb') as out_file:
+                CHUNK = 8192
+                while True:
+                    chunk = response.read(CHUNK)
+                    if not chunk:
+                        break
+                    out_file.write(chunk)
+            print(f"✅ Saved to: {destination}")
+            return  # Success, exit function
+        except Exception as e:
+            print(f"❌ Failed to download {url} on attempt {attempt + 1}: {e}")
+            # Remove partial file if exists
+            if destination.exists():
+                try:
+                    destination.unlink()
+                    print(f"🧹 Removed partial file: {destination}")
+                except Exception as rm_err:
+                    print(f"⚠️ Failed to remove partial file: {rm_err}")
+            attempt += 1
+            if attempt < retries:
+                print(f"⏳ Retrying in {wait_sec} second(s)...")
+                time.sleep(wait_sec)
+            else:
+                print(f"❌ All {retries} attempts failed. Giving up.")
 
 def download_example_files(resources_dir, example_type, from_dict=None):
 
