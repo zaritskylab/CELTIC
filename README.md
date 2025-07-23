@@ -8,7 +8,7 @@ This repository contains the code, models, and data preprocessing tools for the 
 
 
 ## Overview
-This repository provides the complete implementation for training, inference, and context vector generation. The structure is designed to help users easily reproduce the workflow and understand how biological context enhances organelle prediction. Below are the steps for running each part of the pipeline, along with links to the relevant Colab notebooks.
+This repository provides the complete implementation for training, inference, and context vector generation. The structure is designed to help users easily reproduce the workflow and understand how biological context enhances organelle prediction. Below are the steps for running each part of the pipeline, along with links to the relevant notebooks.
     
 ## Data
 
@@ -36,13 +36,13 @@ organelle_name/
 
 
 ```
-`cell_images`: Contains 2052–2993 3D single-cell images cropped from 180 Fields of View (FOVs). Each cell is represented by three aligned 3D images:
+`cell_images`: Contains 2,052–2,993 3D single-cell images per organelle, cropped from 180 Fields of View (FOVs) originating from the Allen Institute [WTC-11 dataset](https://www.nature.com/articles/s41586-022-05563-7). Each cell is represented by three aligned 3D images:
 
 *   <FOVId_CellId>_signal.tiff - Brightfield
 *   <FOVId_CellId>_target.tiff - EGFP-tagged organelle
 *   <FOVId_CellId>_mask.tiff - Segmentation mask
 
-`metadata.csv`: FOV and cell IDs, paths to cell images, columns from the [WTC-11 dataset](https://www.nature.com/articles/s41586-022-05563-7) (e.g., cell index in FOV mask, cell_stage).
+`metadata.csv`: FOV and cell IDs, paths to cell images, columns from the WTC-11 dataset (e.g., cell index in FOV mask, cell_stage).
 
 `context.csv`: Precomputed CELTIC context for each cell (same order as metadata.csv)
 
@@ -64,11 +64,16 @@ organelle_name/
 3. Install the required dependencies:
     ```bash
     pip install .
-
+    ```
+    * If you need to add a kernel for JupyterLab, you might need to run:
+    ```bash
+    pip install notebook jupyterlab
+    python -m ipykernel install --user --name <your env> --display-name "<your env>"
+    ```
 
 ## How-To Notebooks
 
-We have created demo example notebooks, which are located in the `examples` folder.
+We have created example notebooks located in the `examples` folder. Each notebook supports running a minimal demo as well as processing the full dataset.
 
 - **Training the CELTIC Model**: 
 
@@ -101,6 +106,25 @@ We have created demo example notebooks, which are located in the `examples` fold
 **Author**: [Nitsan Elmalam](mailto:enitsan8@gmail.com)
 
 **Corresponding Author**: [Assaf Zaritsky](mailto:assafzar@gmail.com)
+
+## Citation
+
+If you use this implementation in your research, please cite:
+
+<b>Elmalam, N. & Zaritsky, A.</b><br>
+<i>Cell-context dependent in silico organelle localization in label-free microscopy images</i><br>
+bioRxiv (2024). https://doi.org/10.1101/2024.11.10.622841
+<pre>@article {Elmalam2024.11.10.622841,
+	author = {Elmalam, Nitsan and Zaritsky, Assaf},
+	title = {Cell-context dependent in silico organelle localization in label-free microscopy images},
+	elocation-id = {2024.11.10.622841},
+	year = {2024},
+	doi = {10.1101/2024.11.10.622841},
+	publisher = {Cold Spring Harbor Laboratory},
+	URL = {https://www.biorxiv.org/content/early/2024/11/10/2024.11.10.622841},
+	eprint = {https://www.biorxiv.org/content/early/2024/11/10/2024.11.10.622841.full.pdf},
+	journal = {bioRxiv}
+} </pre>
 
 ## License
 
